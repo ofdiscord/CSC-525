@@ -28,7 +28,7 @@ GLfloat pixelMap[512][512][3];
 void drawPoints()
 {
 	//draw pixels
-	glRasterPos2i(0, -256);
+	glRasterPos2i(-256, -256);
 	glDrawPixels(512, 512, GL_RGB, GL_FLOAT, pixelMap);
 }
 
@@ -36,11 +36,11 @@ void drawPoints()
 void myInit()
 {
 	glClearColor(1, 1, 1, 0); // specify a background clor: white
-	gluOrtho2D(-512, 512, -256, 256); // specify a viewing area
+	gluOrtho2D(-256, 256, -256, 256); // specify a viewing area
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
 
 	//read in the pixel data from file
-	ifstream inputFile(".//assets//darth-vader.txt");
+	ifstream inputFile(".//assets//data.txt");
 	int counter = 0;
 	int currentRow = 0;
 	int currentCol = 0;
@@ -81,7 +81,7 @@ void myDisplayCallback()
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
-	glutInitWindowSize(1024, 512); // specify a window size
+	glutInitWindowSize(512, 512); // specify a window size
 	glutInitWindowPosition(100, 0); // specify a window position
 	glutCreateWindow("Project 1"); // create a titled window
 
