@@ -19,17 +19,38 @@
 #include <GL/glut.h> // include GLUT library
 #include <fstream>
 #include <cmath>
+#include <string>
 
 using std::ifstream;
 using std::floor;
+using std::string;
+using std::floor;
+using std::cout;
 
 GLfloat pixelMap[512][512][3];
 
+
 void drawPoints()
 {
-	//draw pixels
+	// Draw background image
 	glRasterPos2i(-256, -256);
 	glDrawPixels(512, 512, GL_RGB, GL_FLOAT, pixelMap);
+
+
+	// Draw title text
+	string titleText = "\"I said I wanted it black\"";
+	int strWidth = 0;
+
+	for (int i = 0; i < titleText.size(); i++) // acquire width
+		strWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, titleText[i]);
+
+	int offset = floor(strWidth / 2);
+
+	glColor3f(1, 1, 1);
+	glRasterPos2i(-offset, 30);
+
+	for (int i = 0; i < titleText.size(); i++) // title text
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, titleText[i]);
 }
 
 //***********************************************************************************
