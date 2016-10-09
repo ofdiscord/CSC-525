@@ -1,12 +1,11 @@
 /*==================================================================================================
- PROGRAMMER: Garren Ijames
+ PROGRAMMER:
  COURSE: CSC 525/625
- MODIFIED BY:	Garren Ijames
+ MODIFIED BY:
  LAST MODIFIED DATE: 9/30/2016
- DESCRIPTION: Read in pixel data from 'autumn.txt' and render the picture they create to the
- graphics window.
+ DESCRIPTION:
  NOTE: N/A
- FILES: lab7.cpp
+ FILES: project1.cpp
  IDE/COMPILER: Visual Studio 2013
  INSTRUCTION FOR COMPILATION AND EXECUTION:
 	1.		Double click on labProject.sln	to OPEN the project
@@ -27,11 +26,53 @@ using std::string;
 using std::floor;
 using std::cout;
 
+// Global variable for pixelMap image
 GLfloat pixelMap[512][512][3];
 
+// Global variable for polygon pattern
+GLubyte polygonPattern[128] = {
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x01, 0xc0, 0x00,
+		0x00, 0x1f, 0xfc, 0x00,
+		0x00, 0x78, 0x8f, 0x00, //5
+		0x00, 0xe3, 0xe3, 0x80,
+		0x01, 0x83, 0xe0, 0xc0,
+		0x03, 0xdf, 0xfd, 0xe0,
+		0x06, 0xfe, 0x3f, 0xb0,
+		0x06, 0x76, 0x37, 0x30, //10
+		0x0c, 0xe7, 0x73, 0x98,
+		0x0c, 0xc3, 0x61, 0x98,
+		0x08, 0xf0, 0x07, 0x88,
+		0x0b, 0xf8, 0x0f, 0xe8,
+		0x1b, 0x98, 0x0c, 0xec,
+		0x1f, 0x80, 0x00, 0xfc,
+		0x1b, 0x98, 0x0c, 0xec,
+		0x0b, 0xf8, 0x0f, 0xe8,
+		0x08, 0xf0, 0x07, 0x88,
+		0x0c, 0xc3, 0x61, 0x98,
+		0x0c, 0xe7, 0x73, 0x98,
+		0x06, 0x76, 0x37, 0x30, //10
+		0x06, 0xfe, 0x3f, 0xb0,
+		0x03, 0xdf, 0xfd, 0xe0,
+		0x01, 0x83, 0xe0, 0xc0,
+		0x00, 0xe3, 0xe3, 0x80,
+		0x00, 0x78, 0x8f, 0x00, //5
+		0x00, 0x1f, 0xfc, 0x00,
+		0x00, 0x01, 0xc0, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+};
 
-void drawPoints()
+
+void drawDesign()
 {
+	// Enable polygon stipple for later use of pattern
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_POLYGON_STIPPLE);
+
+
 	// Draw background image
 	glRasterPos2i(-256, -256);
 	glDrawPixels(512, 512, GL_RGB, GL_FLOAT, pixelMap);
@@ -51,6 +92,22 @@ void drawPoints()
 
 	for (int i = 0; i < titleText.size(); i++) // title text
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, titleText[i]);
+
+
+	// Draw polygon pattern borders
+	glColor3f(1, 0, 0);
+	glPolygonStipple(polygonPattern);
+
+	glBegin(GL_POLYGON);
+		glVertex2i(-256, -256);
+		glVertex2i(-256, -160);
+		glVertex2i(256, -160);
+		glVertex2i(256, -256);
+	glEnd();
+
+
+
+	// Draw lines
 }
 
 //***********************************************************************************
@@ -58,9 +115,9 @@ void myInit()
 {
 	glClearColor(1, 1, 1, 0); // specify a background clor: white
 	gluOrtho2D(-256, 256, -256, 256); // specify a viewing area
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
 
-	//read in the pixel data from file
+
+	// Read content from text file for 512x512 image rgb values per pixel
 	ifstream inputFile(".//assets//data.txt");
 	int counter = 0;
 	int currentRow = 0;
@@ -88,13 +145,18 @@ void myInit()
 			counter += 1;
 		}
 	}
+
+
+	// Assign polygon pattern array
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
+
 
 //***********************************************************************************
 void myDisplayCallback()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // draw the background
-	drawPoints();
+	drawDesign();
 	glFlush(); // flush out the buffer contents
 }
 
