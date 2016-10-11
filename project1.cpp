@@ -21,6 +21,7 @@
 #include <string>
 
 using std::ifstream;
+using std::ofstream;
 using std::floor;
 using std::string;
 using std::floor;
@@ -28,6 +29,8 @@ using std::cout;
 
 // Global variable for pixelMap image
 GLfloat pixelMap[512][512][3];
+
+GLfloat pixelData[512 * 512 * 3];
 
 // Global variable for polygon pattern
 GLubyte polygonPattern[128] = {
@@ -65,6 +68,25 @@ GLubyte polygonPattern[128] = {
 		0x00, 0x00, 0x00, 0x00,
 };
 
+
+void PixelDataOutput(){
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+
+
+	glReadPixels(0, 0, 512, 512, GL_RGB, GL_FLOAT, pixelData);
+
+	ofstream pixOutStream;
+	pixOutStream.open("C:\\Temp\\savedImg.txt");
+
+	//row output
+	for (int i = 0; i < (512 * 512 * 3); i++){
+		
+		pixOutStream << pixelData[i];
+		pixOutStream << " ";
+
+	}
+}
 
 void drawDesign()
 {
@@ -106,9 +128,9 @@ void drawDesign()
 	glEnd();
 
 
-
 	// Draw lines
 }
+
 
 //***********************************************************************************
 void myInit()
@@ -117,7 +139,7 @@ void myInit()
 	gluOrtho2D(-256, 256, -256, 256); // specify a viewing area
 
 
-	// Read content from text file for 512x512 image rgb values per pixel
+	//// Read content from text file for 512x512 image rgb values per pixel
 	ifstream inputFile(".//assets//data.txt");
 	int counter = 0;
 	int currentRow = 0;
@@ -157,6 +179,7 @@ void myDisplayCallback()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // draw the background
 	drawDesign();
+	
 	glFlush(); // flush out the buffer contents
 }
 
@@ -171,7 +194,7 @@ int main(int argc, char **argv)
 	myInit(); // setting up
 
 	glutDisplayFunc(myDisplayCallback); // register a callback
-
+	PixelDataOutput();
 	glutMainLoop(); // get into an infinite loop
 
 	return 0;
