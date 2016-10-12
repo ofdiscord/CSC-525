@@ -1,17 +1,33 @@
 /*==================================================================================================
- PROGRAMMER:
+ PROGRAMMERS: Matthew Wilson and Garren Ijames
  COURSE: CSC 525/625
- MODIFIED BY:
- LAST MODIFIED DATE: 9/30/2016
- DESCRIPTION:
- NOTE: N/A
+ MODIFIED BY: Matthew Wilson and Garren Ijames
+ LAST MODIFIED DATE: 10/12/2016
+
+ CONTRIBUTIONS:
+		Matt - 50%
+			Main Documentation
+			Frame Buffer Output
+			Circle Drawing
+			Light Saber and Its Glow
+			Bitmap Drawing
+
+		Garren - 50%
+			Base Image Creation
+			Pixelmap Drawing
+			Polygon w/ Stipple
+			Text
+			Lazers and Their Animations
+
+ DESCRIPTION: Project 1 - Demonstrate Basic OpenGL Functionality
+ NOTE: Light Sabre Deploy and Glow. Animated lazers.
  FILES: project1.cpp
  IDE/COMPILER: Visual Studio 2013
  INSTRUCTION FOR COMPILATION AND EXECUTION:
-	1.		Double click on labProject.sln	to OPEN the project
-	2.		Press Ctrl+F7					to COMPILE
-	3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
-	4.		Press Ctrl+F5					to EXECUTE
+	1.		Double click on projProject.sln		to OPEN the project
+	2.		Press Ctrl+F7						to COMPILE
+	3.		Press Ctrl+Shift+B					to BUILD (COMPILE+LINK)
+	4.		Press Ctrl+F5						to EXECUTE
 ==================================================================================================*/
 #include <stdlib.h>
 #include <iostream>
@@ -27,10 +43,9 @@ using std::string;
 using std::floor;
 using std::cout;
 
-// Global variable for pixelMap image
-GLfloat pixelMap[512][512][3];
-
-GLfloat pixelData[512 * 512 * 3];
+// Global variables for pixel images
+GLfloat pixelMap[512][512][3]; //holds pixel info for image to display
+GLfloat pixelData[512 * 512 * 3]; //holds pixel info for image to output to text
 
 // Global variable for polygon pattern
 GLubyte polygonPattern[128] = {
@@ -38,12 +53,12 @@ GLubyte polygonPattern[128] = {
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x01, 0xc0, 0x00,
 		0x00, 0x1f, 0xfc, 0x00,
-		0x00, 0x78, 0x8f, 0x00, //5
+		0x00, 0x78, 0x8f, 0x00,
 		0x00, 0xe3, 0xe3, 0x80,
 		0x01, 0x83, 0xe0, 0xc0,
 		0x03, 0xdf, 0xfd, 0xe0,
 		0x06, 0xfe, 0x3f, 0xb0,
-		0x06, 0x76, 0x37, 0x30, //10
+		0x06, 0x76, 0x37, 0x30,
 		0x0c, 0xe7, 0x73, 0x98,
 		0x0c, 0xc3, 0x61, 0x98,
 		0x08, 0xf0, 0x07, 0x88,
@@ -55,12 +70,12 @@ GLubyte polygonPattern[128] = {
 		0x08, 0xf0, 0x07, 0x88,
 		0x0c, 0xc3, 0x61, 0x98,
 		0x0c, 0xe7, 0x73, 0x98,
-		0x06, 0x76, 0x37, 0x30, //10
+		0x06, 0x76, 0x37, 0x30,
 		0x06, 0xfe, 0x3f, 0xb0,
 		0x03, 0xdf, 0xfd, 0xe0,
 		0x01, 0x83, 0xe0, 0xc0,
 		0x00, 0xe3, 0xe3, 0x80,
-		0x00, 0x78, 0x8f, 0x00, //5
+		0x00, 0x78, 0x8f, 0x00,
 		0x00, 0x1f, 0xfc, 0x00,
 		0x00, 0x01, 0xc0, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -196,17 +211,15 @@ void DrawBitman(){
 	glBitmap(27, 65, 0.0, 0.0, 32, 0, rasters);
 }
 
-void drawDesign()
+void DrawBackground()
 {
 	// Enable polygon stipple for later use of pattern
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_POLYGON_STIPPLE);
 
-
 	// Draw background image
 	glRasterPos2i(-256, -256);
 	glDrawPixels(512, 512, GL_RGB, GL_FLOAT, pixelMap);
-
 
 	// Draw title text
 	string titleText = "\"I said I wanted it black\"";
@@ -222,7 +235,6 @@ void drawDesign()
 
 	for (int i = 0; i < titleText.size(); i++) // title text
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, titleText[i]);
-
 
 	// Draw polygon pattern borders
 	glColor3f(1, 0, 0);
@@ -242,7 +254,7 @@ void drawDesign()
 
 //This function executes all drawing functions and pixel data gathering in one location
 void MasterDraw(){
-	drawDesign();
+	DrawBackground();
 	DrawBitman();
 	DrawLazers();
 
@@ -253,7 +265,6 @@ void myInit()
 {
 	glClearColor(1, 1, 1, 0); // specify a background clor: white
 	gluOrtho2D(-256, 256, -256, 256); // specify a viewing area
-
 
 	//// Read content from text file for 512x512 image rgb values per pixel
 	ifstream inputFile(".//assets//data.txt");
@@ -283,9 +294,6 @@ void myInit()
 			counter += 1;
 		}
 	}
-
-	// Assign polygon pattern array
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 
@@ -293,8 +301,7 @@ void myInit()
 void myDisplayCallback()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // draw the background
-	drawDesign();
-	MasterDraw();
+	MasterDraw(); //draw all image components
 	glFlush(); // flush out the buffer contents
 }
 
@@ -304,7 +311,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitWindowSize(512, 512); // specify a window size
 	glutInitWindowPosition(100, 0); // specify a window position
-	glutCreateWindow("Project 1"); // create a titled window
+	glutCreateWindow("Project 1 - OpenGL Awakens"); // create a titled window
 
 	myInit(); // setting up
 
